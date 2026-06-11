@@ -1,7 +1,6 @@
-import { getVertexAI, getGenerativeModel, Schema } from "firebase/vertexai";
+import { GoogleGenerativeAI, SchemaType, Schema } from "@google/generative-ai";
 import { labelMaps } from "./mapSvg";
 import { replaceCaseInsensitive } from "../utils/string";
-import firebaseApp from "./firebaseApp";
 
 export type CloudProviderType = 'GCP' | 'AWS' | 'Azure';
 
@@ -13,30 +12,41 @@ export interface DiagramProposalInterface {
   title: string;
 }
 
-// Initialize the Vertex AI service
-const vertexAI = getVertexAI(firebaseApp);
+// Get the API key from environment variables
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
-// Provide a JSON schema object using a standard format.
-// Later, pass this schema object into `responseSchema` in the generation config.
-const jsonSchema = Schema.object({
+if (!apiKey) {
+  console.warn("VITE_GEMINI_API_KEY is not defined. AI requests will fail.");
+}
+
+// Initialize the Google Generative AI client
+const genAI = new GoogleGenerativeAI(apiKey || "");
+
+// Define the response schema using standard SchemaType
+const jsonSchema: Schema = {
+  type: SchemaType.OBJECT,
   properties: {
-    proposals: Schema.array({
-      items: Schema.object({
+    proposals: {
+      type: SchemaType.ARRAY,
+      items: {
+        type: SchemaType.OBJECT,
         properties: {
-          title: Schema.string(),
-          description: Schema.string(),
-          diagram: Schema.string(),
-          terraform: Schema.string(),
-          runningCost: Schema.string(),
+          title: { type: SchemaType.STRING },
+          description: { type: SchemaType.STRING },
+          diagram: { type: SchemaType.STRING },
+          terraform: { type: SchemaType.STRING },
+          runningCost: { type: SchemaType.STRING },
         },
-      }),
-    }),
+        required: ["title", "description", "diagram", "terraform", "runningCost"],
+      },
+    },
   },
-});
+  required: ["proposals"],
+};
 
-// Initialize the generative model with a model that supports your use case
-const model = getGenerativeModel(vertexAI, {
-  model: "gemini-2.0-flash-001",
+// Initialize the model
+const model = genAI.getGenerativeModel({
+  model: "gemini-2.5-flash",
   generationConfig: {
     responseMimeType: "application/json",
     responseSchema: jsonSchema,

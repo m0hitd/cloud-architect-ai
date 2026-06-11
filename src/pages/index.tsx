@@ -60,6 +60,7 @@ const Index = () => {
   const [visible, { close: hideLoading, open: showLoading }] = useDisclosure(false);
   const [generatedData, setGeneratedData] = useState<DiagramProposalInterface[]>([]);
   const [activeProposal, setActiveProposal] = useState<DiagramProposalInterface | null>(null);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -134,20 +135,31 @@ const Index = () => {
 
   const generateDiagram = async () => {
     if (requirements.length > 0) {
+      setApiError(null);
       showLoading();
-      const data = await askVertex({
-        requirements: requirements,
-        budget: typeof budget == 'string' ? null : budget,
-        isIncludeLoggingAndMonitoring: isIncludeLoggingAndMonitoring,
-        cloudProvider: cloudProvider,
-      });
+      try {
+        const data = await askVertex({
+          requirements: requirements,
+          budget: typeof budget == 'string' ? null : budget,
+          isIncludeLoggingAndMonitoring: isIncludeLoggingAndMonitoring,
+          cloudProvider: cloudProvider,
+        });
 
-      // Validate and fix mermaid syntax
-      const validatedData = validateAndFixMermaidSyntax(data);
+        // Validate and fix mermaid syntax
+        const validatedData = validateAndFixMermaidSyntax(data);
 
-      setGeneratedData(validatedData);
-      hideLoading();
-      close();
+        setGeneratedData(validatedData);
+        hideLoading();
+        close();
+      } catch (err: any) {
+        console.error("API Error:", err);
+        hideLoading();
+        let message = err.message || "An unexpected error occurred.";
+        if (message.includes("429") || err.status === 429) {
+          message = "Rate limit exceeded (429). Please wait a moment before trying again, or check your Google AI Studio quota limits.";
+        }
+        setApiError(message);
+      }
     }
   };
 
@@ -315,9 +327,13 @@ const Index = () => {
             checked={isIncludeLoggingAndMonitoring}
             onChange={(event) => setIsIncludeLoggingAndMonitoring(event.currentTarget.checked)}
           />
-          <Center>
+          {apiError && (
+            <Alert title="Generation Failed" color="red" mt={20} withCloseButton onClose={() => setApiError(null)}>
+              {apiError}
+            </Alert>
+          )}
+          <Center mt={apiError ? 15 : 10}>
             <Button
-              mt={10}
               w={200}
               onClick={() => generateDiagram()}
               disabled={requirements.length === 0 || !cloudProvider}
@@ -391,13 +407,14 @@ const Index = () => {
                 variant="filled"
                 color="dark"
                 onClick={() => {
+                  setApiError(null);
                   open();
                 }}
                 leftSection={<IconPlus size={16} />}
               >
                 New Project
               </Button>
-              {process.env.NODE_ENV === 'development' && (
+              {import.meta.env.DEV && (
                 <>
                   <Tooltip label="Debug information">
                     <Button
