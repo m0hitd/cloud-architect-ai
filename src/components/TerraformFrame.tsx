@@ -3,7 +3,6 @@ import { duotoneSea } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { CloudProviderType } from "../lib/vertex";
 import { Paper, Title, Button, Group, Tooltip, Text, CopyButton } from "@mantine/core";
 import { IconCopy, IconCheck, IconDownload, IconBrandGithub } from "@tabler/icons-react";
-import { useState } from "react";
 
 const TerraformFrame = ({
   codeString,
@@ -12,7 +11,6 @@ const TerraformFrame = ({
   codeString: string;
   cloudProvider: CloudProviderType;
 }) => {
-  const [copied, setCopied] = useState(false);
 
   // Function to download the Terraform code as a file
   const downloadTerraformCode = () => {
@@ -27,11 +25,11 @@ const TerraformFrame = ({
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
-      <Paper p="md" withBorder mb="md" style={{ backgroundColor: "#f9f9f9" }}>
-        <Group position="apart">
+      <Paper p="md" withBorder mb="md">
+        <Group justify="space-between">
           <div>
             <Title order={4} mb={5}>Terraform Configuration</Title>
-            <Text size="sm" color="dimmed">
+            <Text size="sm" c="dimmed">
               Ready to deploy infrastructure for {cloudProvider}
             </Text>
           </div>

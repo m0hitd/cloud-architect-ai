@@ -1,36 +1,37 @@
-import { MantineProvider, createTheme } from "@mantine/core";
+import { MantineProvider, createTheme, localStorageColorSchemeManager } from "@mantine/core";
 import "@mantine/core/styles.css";
 import Index from "./pages";
+
+const colorSchemeManager = localStorageColorSchemeManager({ key: 'cloud-architect-color-scheme' });
 
 // Create a custom theme for a sleek, modern design
 const theme = createTheme({
   primaryColor: 'dark',
   primaryShade: 8,
   colors: {
-    // Custom color palette
     dark: [
-      '#C1C2C5', // 0: lightest
-      '#A6A7AB', // 1
-      '#909296', // 2
-      '#5C5F66', // 3
-      '#373A40', // 4
-      '#2C2E33', // 5
-      '#25262B', // 6
-      '#1A1B1E', // 7
-      '#141517', // 8: darkest
-      '#101113', // 9: even darker
+      '#C1C2C5',
+      '#A6A7AB',
+      '#909296',
+      '#5C5F66',
+      '#373A40',
+      '#2C2E33',
+      '#25262B',
+      '#1A1B1E',
+      '#141517',
+      '#101113',
     ],
     gray: [
-      '#F8F9FA', // 0: lightest
-      '#F1F3F5', // 1
-      '#E9ECEF', // 2
-      '#DEE2E6', // 3
-      '#CED4DA', // 4
-      '#ADB5BD', // 5
-      '#868E96', // 6
-      '#495057', // 7
-      '#343A40', // 8
-      '#212529', // 9: darkest
+      '#F8F9FA',
+      '#F1F3F5',
+      '#E9ECEF',
+      '#DEE2E6',
+      '#CED4DA',
+      '#ADB5BD',
+      '#868E96',
+      '#495057',
+      '#343A40',
+      '#212529',
     ],
   },
   fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif',
@@ -49,42 +50,23 @@ const theme = createTheme({
         root: {
           fontWeight: 600,
           transition: 'all 0.2s ease',
-          '&:hover': {
-            transform: 'translateY(-2px)',
-            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-          },
         },
       },
     },
     Modal: {
       styles: {
-        header: {
-          fontWeight: 600,
-        },
-        title: {
-          fontSize: '1.2rem',
-        },
-      },
-    },
-    AppShell: {
-      styles: {
-        main: {
-          backgroundColor: '#f8f9fa',
-        },
+        header: { fontWeight: 600 },
+        title: { fontSize: '1.2rem' },
       },
     },
     NavLink: {
       styles: {
-        root: {
-          fontWeight: 500,
-        },
+        root: { fontWeight: 500 },
       },
     },
     Tabs: {
       styles: {
-        tab: {
-          fontWeight: 500,
-        },
+        tab: { fontWeight: 500 },
       },
     },
   },
@@ -92,7 +74,7 @@ const theme = createTheme({
 
 function App() {
   return (
-    <MantineProvider theme={theme} defaultColorScheme="light">
+    <MantineProvider theme={theme} colorSchemeManager={colorSchemeManager} defaultColorScheme="light">
       <Index></Index>
     </MantineProvider>
   );

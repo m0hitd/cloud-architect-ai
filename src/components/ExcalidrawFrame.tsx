@@ -7,7 +7,7 @@ import { ExcalidrawElement } from "@excalidraw/excalidraw/types/element/types";
 import { BinaryFileData } from "@excalidraw/excalidraw/types/types";
 import { mapTextWithSvg } from "../lib/mapSvg";
 import { CloudProviderType } from "../lib/vertex";
-import { Loader, Center, Button, Tabs, Box, Text, Code, Alert, Paper, Badge, Tooltip, Group } from "@mantine/core";
+import { Loader, Center, Button, Tabs, Text, Code, Alert, Paper, Tooltip, Group } from "@mantine/core";
 import { IconRefresh, IconTrash, IconArrowsMaximize, IconCode, IconBrush, IconFileCode } from "@tabler/icons-react";
 import mermaid from "mermaid";
 
@@ -150,7 +150,7 @@ const fixMermaidSyntax = (syntax: string): string => {
       // Replace node definitions with curly braces
       // Pattern: A{Some Label} -> A["Some Label"]
       const nodeWithCurlyBraces = /([A-Za-z0-9_-]+)\s*{([^}]*)}/g;
-      line = line.replace(nodeWithCurlyBraces, (match, id, label) => {
+      line = line.replace(nodeWithCurlyBraces, (_match, id, label) => {
         return `${id}["${label}"]`;
       });
 
@@ -168,7 +168,7 @@ const fixMermaidSyntax = (syntax: string): string => {
     // Fix 5: Replace problematic characters in node IDs
     // This regex finds node IDs that might be causing issues
     const nodeIdRegex = /\b([A-Za-z0-9_-]+)(\s*\[)/g;
-    fixedSyntax = fixedSyntax.replace(nodeIdRegex, (match, id, bracket) => {
+    fixedSyntax = fixedSyntax.replace(nodeIdRegex, (_match, id, bracket) => {
       // Replace spaces and special characters in the ID
       const safeId = id.replace(/[^A-Za-z0-9_-]/g, '_');
       return safeId + bracket;
@@ -467,7 +467,7 @@ const ExcalidrawFrame = ({
       // Try with original syntax first
       try {
         console.log("Trying with original syntax");
-        const { elements: mermaidElements, files } = await parseMermaidToExcalidraw(mermaidSyntax, {
+        const { elements: mermaidElements, files: _files } = await parseMermaidToExcalidraw(mermaidSyntax, {
           themeVariables: { fontSize: "14px" }
         });
 
@@ -514,7 +514,7 @@ const ExcalidrawFrame = ({
 
           try {
             // Try again with fixed syntax
-            const { elements: mermaidElements, files } = await parseMermaidToExcalidraw(fixed, {
+            const { elements: mermaidElements, files: _files2 } = await parseMermaidToExcalidraw(fixed, {
               themeVariables: { fontSize: "14px" }
             });
 
@@ -575,7 +575,7 @@ const ExcalidrawFrame = ({
           const simpleSyntax = `flowchart TD
             A[Start] --> B[End]`;
 
-          const { elements: mermaidElements, files } = await parseMermaidToExcalidraw(simpleSyntax, {
+          const { elements: mermaidElements, files: _files3 } = await parseMermaidToExcalidraw(simpleSyntax, {
             themeVariables: { fontSize: "14px" }
           });
 
@@ -643,7 +643,7 @@ const ExcalidrawFrame = ({
   };
 
   return (
-    <div style={{ height: "800px", position: "relative", backgroundColor: "#ffffff", borderRadius: "8px", overflow: "hidden" }}>
+    <div style={{ height: "800px", position: "relative", backgroundColor: "var(--mantine-color-body)", borderRadius: "8px", overflow: "hidden" }}>
       <div style={{
         position: "absolute",
         top: 5,
@@ -674,7 +674,7 @@ const ExcalidrawFrame = ({
       </div>
 
       {isLoading && activeTab === "excalidraw" && (
-        <Center style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: 10, background: "rgba(255, 255, 255, 0.9)" }}>
+        <Center style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: 10, background: "var(--mantine-color-body-with-opacity, rgba(0,0,0,0.5))" }}>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
             <Loader size="xl" color="dark" />
             <Text mt={10} fw={500} c="dimmed">Rendering diagram...</Text>
@@ -691,9 +691,9 @@ const ExcalidrawFrame = ({
       )}
 
       {error && error.includes("Failed to initialize") && activeTab === "excalidraw" && (
-        <Center style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: 10, background: "rgba(255, 255, 255, 0.95)", flexDirection: "column" }}>
+        <Center style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: 10, background: "var(--mantine-color-body)", flexDirection: "column" }}>
           <Paper shadow="md" p="lg" withBorder style={{ maxWidth: "80%", textAlign: "center" }}>
-            <Text color="red" mb={20} fw={500}>
+            <Text c="red" mb={20} fw={500}>
               {error}
             </Text>
             <Group>
@@ -709,7 +709,7 @@ const ExcalidrawFrame = ({
       )}
 
       <Tabs value={activeTab} onChange={setActiveTab} style={{ height: "100%" }} variant="outline" color="dark">
-        <Tabs.List style={{ justifyContent: "center", borderBottom: "1px solid #eee" }}>
+        <Tabs.List style={{ justifyContent: "center", borderBottom: "1px solid var(--mantine-color-default-border)" }}>
           <Tabs.Tab value="excalidraw" leftSection={<IconArrowsMaximize size={16} />}>Interactive Diagram</Tabs.Tab>
           <Tabs.Tab value="mermaid" leftSection={<IconBrush size={16} />}>Mermaid View</Tabs.Tab>
           <Tabs.Tab value="source" leftSection={<IconCode size={16} />}>Source</Tabs.Tab>
@@ -731,7 +731,7 @@ const ExcalidrawFrame = ({
 
           {!isLoading && !error?.includes("Failed to initialize") && activeTab === "excalidraw" && (
             <div style={{ position: "absolute", bottom: 15, left: 0, right: 0, zIndex: 5, textAlign: "center" }}>
-              <Paper shadow="sm" p="xs" style={{ display: "inline-flex", backgroundColor: "rgba(255, 255, 255, 0.9)", borderRadius: "8px" }}>
+              <Paper shadow="sm" p="xs" withBorder style={{ display: "inline-flex", borderRadius: "8px" }}>
                 <Tooltip label="Center the diagram">
                   <Button
                     size="sm"
@@ -787,8 +787,8 @@ const ExcalidrawFrame = ({
         </Tabs.Panel>
 
         <Tabs.Panel value="mermaid" style={{ height: "calc(100% - 40px)", padding: "20px", overflow: "auto" }}>
-          <Paper shadow="xs" p="md" withBorder style={{ backgroundColor: "#f9f9f9", minHeight: "500px", position: "relative" }}>
-            <Text size="xs" color="dimmed" style={{ position: "absolute", top: 10, right: 10, zIndex: 2 }}>
+          <Paper shadow="xs" p="md" withBorder style={{ minHeight: "500px", position: "relative" }}>
+            <Text size="xs" c="dimmed" style={{ position: "absolute", top: 10, right: 10, zIndex: 2 }}>
               Mermaid Diagram View
             </Text>
 
@@ -835,7 +835,7 @@ const ExcalidrawFrame = ({
             </Tooltip>
           </Group>
 
-          <Text size="xs" color="dimmed" mt="md" style={{ textAlign: "center" }}>
+          <Text size="xs" c="dimmed" mt="md" style={{ textAlign: "center" }}>
             This view shows a static rendering of the diagram using Mermaid syntax.
             For interactive features, use the "Interactive Diagram" tab.
           </Text>
@@ -850,9 +850,9 @@ const ExcalidrawFrame = ({
 
           {fixedSyntax && fixedSyntax !== mermaidSyntax && (
             <>
-              <Paper withBorder p="md" mb={30} style={{ backgroundColor: "#f9f9f9", position: "relative" }}>
+              <Paper withBorder p="md" mb={30} style={{ position: "relative" }}>
                 <Text size="sm" mb={10} fw={700}>Fixed Mermaid Syntax:</Text>
-                <Code block style={{ whiteSpace: "pre-wrap", backgroundColor: "#f0f0f0", padding: "15px", borderRadius: "4px", fontSize: "0.9em", lineHeight: 1.5 }}>{fixedSyntax}</Code>
+                <Code block style={{ whiteSpace: "pre-wrap", padding: "15px", borderRadius: "4px", fontSize: "0.9em", lineHeight: 1.5 }}>{fixedSyntax}</Code>
                 <Tooltip label="Copy to clipboard">
                   <Button
                     variant="subtle"
@@ -870,9 +870,9 @@ const ExcalidrawFrame = ({
                 </Tooltip>
               </Paper>
 
-              <Paper withBorder p="md" style={{ backgroundColor: "#f9f9f9", position: "relative" }}>
+              <Paper withBorder p="md" style={{ position: "relative" }}>
                 <Text size="sm" mb={10} fw={700}>Original Mermaid Syntax:</Text>
-                <Code block style={{ whiteSpace: "pre-wrap", backgroundColor: "#f0f0f0", padding: "15px", borderRadius: "4px", fontSize: "0.9em", lineHeight: 1.5, opacity: 0.8 }}>{mermaidSyntax}</Code>
+                <Code block style={{ whiteSpace: "pre-wrap", padding: "15px", borderRadius: "4px", fontSize: "0.9em", lineHeight: 1.5, opacity: 0.8 }}>{mermaidSyntax}</Code>
                 <Tooltip label="Copy to clipboard">
                   <Button
                     variant="subtle"
@@ -893,9 +893,9 @@ const ExcalidrawFrame = ({
           )}
 
           {(!fixedSyntax || fixedSyntax === mermaidSyntax) && (
-            <Paper withBorder p="md" style={{ backgroundColor: "#f9f9f9", position: "relative" }}>
+            <Paper withBorder p="md" style={{ position: "relative" }}>
               <Text size="sm" mb={10} fw={700}>Mermaid Source Code:</Text>
-              <Code block style={{ whiteSpace: "pre-wrap", backgroundColor: "#f0f0f0", padding: "15px", borderRadius: "4px", fontSize: "0.9em", lineHeight: 1.5 }}>{mermaidSyntax}</Code>
+              <Code block style={{ whiteSpace: "pre-wrap", padding: "15px", borderRadius: "4px", fontSize: "0.9em", lineHeight: 1.5 }}>{mermaidSyntax}</Code>
               <Tooltip label="Copy to clipboard">
                 <Button
                   variant="subtle"

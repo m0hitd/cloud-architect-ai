@@ -1,6 +1,5 @@
 import {
   AppShell,
-  Box,
   Burger,
   Button,
   Center,
@@ -17,12 +16,13 @@ import {
   Textarea,
   Title,
   useMantineTheme,
+  useMantineColorScheme,
   Alert,
   Paper,
-  Container,
   Divider,
   Badge,
   Tooltip,
+  ActionIcon,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import ExcalidrawFrame from '../components/ExcalidrawFrame';
@@ -35,6 +35,8 @@ import {
   IconRefresh,
   IconBug,
   IconCloudComputing,
+  IconSun,
+  IconMoon,
 } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import TerraformFrame from '../components/TerraformFrame';
@@ -45,6 +47,8 @@ type MainComponentType = 'diagram' | 'terraform';
 
 const Index = () => {
   const theme = useMantineTheme();
+  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+  const isDark = colorScheme === 'dark';
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
   const [requirements, setRequirements] = useState(
@@ -339,11 +343,11 @@ const Index = () => {
         padding="md"
         styles={{
           main: {
-            backgroundColor: theme.colors.gray[0],
+            backgroundColor: 'var(--mantine-color-body)',
           },
         }}
       >
-        <AppShell.Header style={{ borderBottom: `1px solid ${theme.colors.gray[2]}` }}>
+        <AppShell.Header style={{ borderBottom: '1px solid var(--mantine-color-default-border)' }}>
           <Group h="100%" px="md" justify="space-between">
             <Group>
               <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom="sm" size="sm" />
@@ -352,9 +356,7 @@ const Index = () => {
                 order={3}
                 style={{
                   fontWeight: 800,
-                  background: `linear-gradient(135deg, ${theme.colors.dark[9]}, ${theme.colors.dark[5]})`,
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
+                  color: 'var(--mantine-color-text)',
                 }}
               >
                 Cloud Architect AI
@@ -368,6 +370,23 @@ const Index = () => {
                 generateDiagramWithExample={generateDiagramWithExample}
                 cloudProvider={cloudProvider}
               />
+              <Tooltip label={isDark ? 'Switch to light mode' : 'Switch to dark mode'} position="bottom">
+                <ActionIcon
+                  id="color-scheme-toggle"
+                  variant="subtle"
+                  color={isDark ? 'yellow' : 'dark'}
+                  size="lg"
+                  radius="md"
+                  onClick={() => toggleColorScheme()}
+                  aria-label="Toggle color scheme"
+                  style={{
+                    transition: 'transform 0.3s ease, background 0.2s ease',
+                    transform: isDark ? 'rotate(20deg)' : 'rotate(0deg)',
+                  }}
+                >
+                  {isDark ? <IconSun size={20} stroke={1.8} /> : <IconMoon size={20} stroke={1.8} />}
+                </ActionIcon>
+              </Tooltip>
               <Button
                 variant="filled"
                 color="dark"
@@ -427,7 +446,7 @@ const Index = () => {
         <AppShell.Navbar
           p="md"
           style={{
-            borderRight: `1px solid ${theme.colors.gray[2]}`,
+            borderRight: '1px solid var(--mantine-color-default-border)',
             display: 'flex',
             flexDirection: 'column',
           }}
@@ -465,35 +484,11 @@ const Index = () => {
             </Text>
           </div>
 
-          <div style={{ marginTop: 'auto', marginBottom: '10px' }}>
-            <Paper
-              p="xs"
-              radius="md"
-              withBorder
-              style={{
-                backgroundColor: 'rgba(0,0,0,0.02)',
-                borderColor: theme.colors.gray[2],
-              }}
-            >
-              <Text
-                size="xs"
-                style={{
-                  textAlign: 'center',
-                  padding: '5px 0',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'black',
-                  fontWeight: 600,
-                  fontSize: '12px',
-                }}
-              >
-                Built with ❤️ by Siddhant
-              </Text>
-            </Paper>
-          </div>
+
         </AppShell.Navbar>
 
         <AppShell.Main>
-          <Paper shadow="xs" p="md" withBorder style={{ height: '100%', backgroundColor: 'white' }}>
+          <Paper shadow="xs" p="md" withBorder style={{ height: '100%' }}>
             <div
               style={{
                 display: mainComponent === 'diagram' ? 'block' : 'none',
@@ -540,13 +535,13 @@ const Index = () => {
             </div>
           </Paper>
         </AppShell.Main>
-        <AppShell.Aside p="md" style={{ borderLeft: `1px solid ${theme.colors.gray[2]}` }}>
+        <AppShell.Aside p="md" style={{ borderLeft: '1px solid var(--mantine-color-default-border)' }}>
           <Title mb={15} order={4} style={{ fontWeight: 600 }}>
             Design Proposals
           </Title>
           <Stack>
             {generatedData.length === 0 && (
-              <Paper withBorder p="md" style={{ backgroundColor: theme.colors.gray[0] }}>
+              <Paper withBorder p="md">
                 <Text size="sm" c="dimmed" style={{ textAlign: 'center' }}>
                   No proposals yet. Click "New Project" to generate some!
                 </Text>
@@ -641,9 +636,7 @@ const Index = () => {
                   mb={15}
                   style={{
                     borderRadius: '8px',
-                    background: 'white',
                     boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-                    border: '1px solid #f1f3f5',
                   }}
                 >
                   <Text
@@ -651,14 +644,14 @@ const Index = () => {
                     fw={600}
                     mb={5}
                     style={{
-                      color: theme.colors.dark[7],
-                      borderBottom: '1px solid #f1f3f5',
+                      color: 'var(--mantine-color-text)',
+                      borderBottom: '1px solid var(--mantine-color-default-border)',
                       paddingBottom: '5px',
                     }}
                   >
                     Description
                   </Text>
-                  <Text size="sm" mb={15} style={{ lineHeight: 1.5, color: theme.colors.dark[6] }}>
+                  <Text size="sm" mb={15} c="dimmed" style={{ lineHeight: 1.5 }}>
                     {activeProposal.description}
                   </Text>
 
@@ -670,27 +663,32 @@ const Index = () => {
                       padding: '10px 0',
                     }}
                   >
-                    <div
+                    <Paper
+                      withBorder
+                      p="sm"
+                      radius="md"
                       style={{
-                        color: 'white',
-                        boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-                        padding: '10px 15px',
-                        borderRadius: '8px',
+                        boxShadow: '0 2px 5px rgba(0,0,0,0.08)',
                         textAlign: 'center',
-                        width: 'auto',
                         minWidth: '200px',
                         maxWidth: '100%',
                         display: 'inline-block',
+                        background:
+                          cloudProvider === 'GCP'
+                            ? 'linear-gradient(135deg, #4285F4, #34A853)'
+                            : cloudProvider === 'AWS'
+                            ? 'linear-gradient(135deg, #FF9900, #232F3E)'
+                            : 'linear-gradient(135deg, #0078D4, #5C2D91)',
                       }}
                     >
                       <Text
-                        fw={600}
+                        fw={700}
                         size="sm"
-                        style={{ color: 'black', whiteSpace: 'normal', wordBreak: 'break-word' }}
+                        style={{ color: 'white', whiteSpace: 'normal', wordBreak: 'break-word' }}
                       >
                         {activeProposal.runningCost}
                       </Text>
-                    </div>
+                    </Paper>
                   </div>
                 </Paper>
 
