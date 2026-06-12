@@ -1,4 +1,4 @@
-# Cloud Architect AI
+# AI ENTERPRISE ARCHITECT
 
 > Describe your infrastructure in plain English. Get architecture diagrams, Terraform, and cost estimates — instantly.
 
