@@ -1,100 +1,97 @@
-# Cloud Architect AI 🚀
+# Cloud Architect AI
 
-An intelligent cloud architecture design tool that helps you visualize, plan, and implement cloud infrastructure using AI.
+> Describe your infrastructure in plain English. Get architecture diagrams, Terraform, and cost estimates — instantly.
 
-**Video demo**
+---
 
-[![Product video demo - Cloud Architect AI](https://img.youtube.com/vi/PIFVbbO6O8M/0.jpg)](https://www.youtube.com/watch?v=PIFVbbO6O8M)
+## Screenshots
 
-## ✨ Features
+![Architecture input — describe your requirements, choose a cloud provider and budget](public/assets/Project%20Screenshots/Screenshot%202026-06-11%20175105.png)
 
-- **AI-Powered Architecture Design**: Generate cloud architecture diagrams based on your requirements
-- **Multi-Cloud Support**: Design for Google Cloud Platform (GCP), Amazon Web Services (AWS), or Microsoft Azure
-- **Interactive Diagrams**: View and edit your architecture diagrams in real-time
-- **Terraform Integration**: Generate Terraform code for your architecture
-- **Cost Estimation**: Get estimated running costs for your infrastructure
-- **Customization**: Adjust your designs with budget constraints and specific requirements
+![Terraform output — ready-to-deploy HCL with syntax highlighting](public/assets/Project%20Screenshots/Screenshot%20for%20cloud%20aechitect%20ai%204.png)
 
-## 🛠️ Tech Stack
+---
 
-- **Frontend**: React with TypeScript
-- **UI Framework**: Mantine UI
-- **Diagramming**: Mermaid.js and Excalidraw
-- **AI Integration**: Google Vertex AI via Firebase Extensions
-- **Hosting**: Firebase Hosting
-- **Code Highlighting**: React Syntax Highlighter
+## Overview
 
-## 🚀 Getting Started
+Cloud Architect AI is a browser-based tool that uses Google Gemini to turn natural-language requirements into production-ready cloud architecture proposals. Each proposal includes an interactive diagram, deployable Terraform code, and a monthly cost estimate.
 
-### Prerequisites
+Supports **GCP**, **AWS**, and **Azure**.
 
-- Node.js (v18 or higher)
-- npm or yarn
-- Firebase account
-- Google Cloud Platform account (for Vertex AI)
+---
 
-### Installation
+## Features
 
-1. Clone this repository
-   ```bash
-   git clone https://github.com/Siddhant-K-code/cloud-architect-ai.git
-   cd cloud-architect-ai
-   ```
+| | |
+|---|---|
+| **AI-generated diagrams** | Three architecture proposals per request, ranked by fit |
+| **Multi-cloud** | GCP · AWS · Azure — switch with one click |
+| **Interactive canvas** | Excalidraw-powered diagrams you can edit in the browser |
+| **Terraform output** | Ready-to-deploy HCL with syntax highlighting |
+| **Cost estimates** | Monthly USD estimates per proposal |
+| **Budget constraints** | Set a budget ceiling and let the AI adapt |
+| **Monitoring toggle** | Include or exclude cloud-native observability services |
 
-2. Install dependencies
-   ```bash
-   npm install
-   ```
+---
 
-3. Run the setup script (recommended for first-time setup)
-   ```bash
-   ./setup.sh
-   ```
-   This script will guide you through the Firebase setup process.
+## Tech Stack
 
-4. Set up Firebase manually (alternative to step 3)
-   - Create a new Firebase project at [firebase.google.com](https://firebase.google.com)
-   - Enable Firebase Hosting
-   - Set up Vertex AI extension in Firebase
-   - Update the Firebase configuration in `src/lib/firebaseApp.ts`
-   - For detailed instructions, see [FIREBASE_SETUP.md](./FIREBASE_SETUP.md)
+| Layer | Technology |
+|---|---|
+| Frontend | React 18 + TypeScript + Vite |
+| UI | Mantine UI v7 |
+| Diagramming | Excalidraw + Mermaid.js |
+| AI | Google Gemini 2.5 Flash (`@google/generative-ai`) |
+| Hosting | Firebase Hosting *(optional)* |
 
-5. Start the development server
-   ```bash
-   npm run dev
-   ```
+---
 
-6. Build for production
-   ```bash
-   npm run build
-   ```
+## Quick Start
 
-7. Deploy to Firebase
-   ```bash
-   firebase deploy
-   ```
+**Prerequisites:** Node.js v18+, a [Gemini API key](https://aistudio.google.com/app/apikey)
 
-### Setup Resources
+```bash
+# 1. Clone and install
+git clone https://github.com/Siddhant-K-code/cloud-architect-ai.git
+cd cloud-architect-ai
+npm install
 
-- [SETUP_CHECKLIST.md](./SETUP_CHECKLIST.md) - A comprehensive checklist to track your setup progress
-- [FIREBASE_SETUP.md](./FIREBASE_SETUP.md) - Detailed instructions for setting up Firebase and Vertex AI
+# 2. Configure environment
+cp .env.example .env.local
+# → Open .env.local and set VITE_GEMINI_API_KEY
 
-## 🧠 How It Works
+# 3. Run
+npm run dev
+```
 
-1. **Input Your Requirements**: Describe what you need in plain English
-2. **Set Constraints**: Specify your budget and cloud provider preference
-3. **Generate Designs**: AI creates multiple architecture proposals
-4. **Review & Customize**: Explore different options and make adjustments
-5. **Export**: Get Terraform code ready for deployment
+Open [http://localhost:5173](http://localhost:5173). That's it — no Firebase required to run locally.
 
-## 📝 License
+---
 
-This project is licensed under the MIT License - see the [LICENSE file](./LICENSE) for details.
+## How It Works
 
-## 🙏 Acknowledgements
+1. **Describe** your system in plain English
+2. **Set constraints** — cloud provider, budget, observability preferences
+3. **Generate** — Gemini returns three ranked architecture proposals
+4. **Explore** — switch between proposals, pan and zoom the diagram
+5. **Export** — copy the Terraform code and deploy
 
-- [Mantine UI](https://mantine.dev/) for the beautiful UI components
-- [Mermaid.js](https://mermaid-js.github.io/) for diagram rendering
-- [Excalidraw](https://excalidraw.com/) for interactive diagrams
-- [Firebase](https://firebase.google.com/) for hosting and backend services
-- [Google Vertex AI](https://cloud.google.com/vertex-ai) for AI capabilities
+---
+
+## Deployment
+
+Firebase Hosting is optional and only needed to publish the app publicly.
+
+```bash
+npm run build
+firebase deploy
+```
+
+For a step-by-step walkthrough see [FIREBASE_SETUP.md](./FIREBASE_SETUP.md).  
+For a progress tracker see [SETUP_CHECKLIST.md](./SETUP_CHECKLIST.md).
+
+---
+
+## License
+
+MIT — see [LICENSE](./LICENSE).

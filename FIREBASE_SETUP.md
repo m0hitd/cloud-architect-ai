@@ -1,138 +1,179 @@
-# Firebase and Vertex AI Setup Guide
+# Setup Guide — Cloud Architect AI
 
-This guide will walk you through setting up Firebase and Vertex AI for the Cloud Architect AI project.
+This guide covers everything you need to get Cloud Architect AI running locally and deployed to Firebase Hosting.
 
-> [!NOTE]
-> For an automated setup experience, you can use the included setup script by running `./setup.sh` in the project root directory. The script will guide you through most of the steps below.
+> [!IMPORTANT]
+> The app uses the **Google Gemini API** directly via the `@google/generative-ai` SDK. It does **not** use the Firebase Vertex AI Extension. Firebase is only used for **static hosting**.
 
-## 1. Create a Firebase Project
+---
 
-1. Go to [Firebase Console](https://console.firebase.google.com/)
-2. Click "Add project"
-3. Enter a project name (e.g., "cloud-architect-ai")
-4. Choose whether to enable Google Analytics (recommended)
-5. Accept the terms and click "Create project"
-6. Wait for the project to be created and click "Continue"
+## Architecture Overview
 
-## 2. Register Your Web App
+```
+Browser (React + Vite)
+  │
+  ├── @google/generative-ai SDK
+  │     └── Calls Gemini 2.5 Flash via VITE_GEMINI_API_KEY
+  │
+  └── Firebase Hosting (optional — for deployment only)
+```
 
-1. In the Firebase console, click on the web icon (</>) to add a web app
-2. Enter a nickname for your app (e.g., "Cloud Architect AI Web")
-3. Check the box for "Also set up Firebase Hosting"
-4. Click "Register app"
-5. Copy the Firebase configuration object that appears
-6. Replace the placeholder configuration in `src/lib/firebaseApp.ts` with your configuration
-7. Click "Next" and then "Continue to console"
+**Key packages:**
+| Package | Purpose |
+|---|---|
+| `@google/generative-ai` | Gemini API client (AI generation) |
+| `@excalidraw/excalidraw` | Interactive diagram canvas |
+| `@excalidraw/mermaid-to-excalidraw` | Convert Mermaid → Excalidraw |
+| `mermaid` | Diagram parsing |
+| `@mantine/core` | UI component library |
+| `react-syntax-highlighter` | Terraform code display |
 
-## 3. Set Up Firebase Hosting
+---
 
-1. Install the Firebase CLI if you haven't already:
-   ```bash
-   npm install -g firebase-tools
-   ```
+## Part 1 — Local Development
 
-2. Log in to Firebase:
-   ```bash
-   firebase login
-   ```
+### Step 1: Prerequisites
 
-3. Initialize Firebase in your project directory:
-   ```bash
-   firebase init
-   ```
+- Node.js **v18 or higher** → [nodejs.org](https://nodejs.org)
+- A Gemini API key → [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)
 
-4. Select "Hosting" when prompted for features
-5. Select your Firebase project
-6. Specify "dist" as your public directory
-7. Configure as a single-page app: Yes
-8. Set up automatic builds and deploys with GitHub: No (unless you want to)
+### Step 2: Install dependencies
 
-## 4. Set Up Vertex AI
+```bash
+npm install
+```
 
-### Enable Vertex AI API
+### Step 3: Configure environment variables
 
-1. Go to the [Google Cloud Console](https://console.cloud.google.com/)
-2. Make sure you're in the same project as your Firebase project
-3. Navigate to "APIs & Services" > "Library"
-4. Search for "Vertex AI API"
-5. Click on it and then click "Enable"
+```bash
+# Copy the template
+cp .env.example .env.local
+```
 
-### Set Up Firebase Extensions for Vertex AI
+Open `.env.local` and set your Gemini API key:
 
-1. In the Firebase console, go to "Extensions"
-2. Click "Browse Extensions"
-3. Search for "Vertex AI"
-4. Select "Use Vertex AI with Firebase"
-5. Click "Install extension"
-6. Follow the prompts to configure the extension
-   - Choose the region closest to your users
-   - Select the Gemini model (gemini-pro)
-   - Configure authentication as needed
+```env
+VITE_GEMINI_API_KEY=your_gemini_api_key_here
+```
 
-## 5. Update Project Configuration
+> [!CAUTION]
+> Never commit `.env.local` to version control. It is already listed in `.gitignore`.
 
-1. Update `.firebaserc` with your Firebase project ID:
-   ```json
-   {
-     "projects": {
-       "default": "YOUR_FIREBASE_PROJECT_ID"
-     }
-   }
-   ```
+### Step 4: Start the dev server
 
-2. Make sure your `firebase.json` looks like this:
-   ```json
-   {
-     "hosting": {
-       "public": "dist",
-       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-       "rewrites": [
-         {
-           "source": "**",
-           "destination": "/index.html"
-         }
-       ]
-     }
-   }
-   ```
+```bash
+npm run dev
+```
 
-## 6. Build and Deploy
+Open [http://localhost:5173](http://localhost:5173) in your browser. The app should load and AI generation should work immediately once the API key is set.
 
-1. Build your project:
-   ```bash
-   npm run build
-   ```
+---
 
-2. Deploy to Firebase:
-   ```bash
-   firebase deploy
-   ```
+## Part 2 — Firebase Hosting (Optional Deployment)
 
-3. Your app should now be live at `https://YOUR_PROJECT_ID.web.app`
+Firebase is only needed if you want to host the app on Firebase Hosting. The AI functionality works without it.
+
+### Step 1: Install Firebase CLI
+
+```bash
+npm install -g firebase-tools
+```
+
+### Step 2: Log in to Firebase
+
+```bash
+firebase login
+```
+
+### Step 3: Create a Firebase project
+
+1. Go to [console.firebase.google.com](https://console.firebase.google.com/)
+2. Click **Add project**
+3. Enter a project name (e.g., `cloud-architect-ai`)
+4. Enable or skip Google Analytics
+5. Click **Create project**
+
+### Step 4: Register a web app
+
+1. In the Firebase console, click the **</>** (Web) icon to add a web app
+2. Enter a nickname (e.g., `Cloud Architect AI Web`)
+3. Check **Also set up Firebase Hosting**
+4. Click **Register app** — note the `firebaseConfig` values shown (you'll need these if you add Firebase Auth or Analytics later)
+5. Click **Next** → **Continue to console**
+
+### Step 5: Update `.firebaserc`
+
+Replace `YOUR_FIREBASE_PROJECT_ID` with your actual project ID:
+
+```json
+{
+  "projects": {
+    "default": "your-firebase-project-id"
+  }
+}
+```
+
+> [!TIP]
+> You can find your project ID in the Firebase console URL: `https://console.firebase.google.com/project/<project-id>`
+
+### Step 6: Build and deploy
+
+```bash
+# Build the production bundle
+npm run build
+
+# Deploy to Firebase Hosting
+firebase deploy
+```
+
+Your app will be live at `https://your-project-id.web.app`.
+
+---
+
+## Part 3 — Environment Variables Reference
+
+See [`.env.example`](./.env.example) for the full annotated reference.
+
+| Variable | Required | Description |
+|---|---|---|
+| `VITE_GEMINI_API_KEY` | **Yes** | Gemini API key from AI Studio |
+| `VITE_FIREBASE_API_KEY` | No | Firebase Web API key (hosting only) |
+| `VITE_FIREBASE_AUTH_DOMAIN` | No | `<project-id>.firebaseapp.com` |
+| `VITE_FIREBASE_PROJECT_ID` | No | Your Firebase project ID |
+| `VITE_FIREBASE_STORAGE_BUCKET` | No | `<project-id>.appspot.com` |
+| `VITE_FIREBASE_MESSAGING_SENDER_ID` | No | Firebase messaging sender ID |
+| `VITE_FIREBASE_APP_ID` | No | Firebase app ID |
+| `VITE_FIREBASE_MEASUREMENT_ID` | No | Analytics measurement ID (optional) |
+
+---
 
 ## Troubleshooting
 
-### Vertex AI Authentication Issues
+### "AI generation fails / returns an error"
 
-If you encounter authentication issues with Vertex AI:
+- Confirm `VITE_GEMINI_API_KEY` is set correctly in `.env.local`
+- Ensure the key has **Generative Language API** access enabled in Google Cloud
+- Check the browser console for the exact error message
+- Make sure you're not hitting Gemini API [rate limits](https://ai.google.dev/gemini-api/docs/rate-limits)
 
-1. Make sure you've enabled billing for your Google Cloud project
-2. Ensure the service account has the necessary permissions
-3. Check that the Vertex AI API is enabled
-4. Verify that the Firebase Extensions for Vertex AI is properly configured
+### "blank page or app doesn't load"
 
-### Deployment Issues
+- Run `npm install` to ensure all dependencies are present
+- Check the terminal running `npm run dev` for TypeScript/Vite errors
 
-If you encounter issues during deployment:
+### "Firebase deploy fails"
 
-1. Make sure you're logged in to the correct Firebase account
-2. Verify that your `.firebaserc` file has the correct project ID
-3. Ensure that your build process completed successfully
-4. Check that the "dist" directory exists and contains your built application
+- Confirm you're logged in: `firebase login`
+- Verify `.firebaserc` has the correct project ID
+- Ensure `npm run build` completed without errors and the `dist/` folder exists
+
+---
 
 ## Additional Resources
 
-- [Firebase Documentation](https://firebase.google.com/docs)
-- [Vertex AI Documentation](https://cloud.google.com/vertex-ai/docs)
-- [Firebase Extensions](https://firebase.google.com/docs/extensions)
-- [Firebase Hosting](https://firebase.google.com/docs/hosting)
+- [Gemini API Docs](https://ai.google.dev/gemini-api/docs)
+- [Google AI Studio](https://aistudio.google.com/)
+- [Firebase Hosting Docs](https://firebase.google.com/docs/hosting)
+- [Vite Docs](https://vitejs.dev/guide/)
+- [Mantine UI Docs](https://mantine.dev/)
+- [Excalidraw Docs](https://github.com/excalidraw/excalidraw)
